@@ -9,10 +9,10 @@ use PDOException;
 
 class UserController extends Controller {
 
-    public function index(){
+    public function index() {
 
-        $users = app('db')->table('users')->get();
-        return response()->json($users);
+        $users = app( 'db' )->table( 'users' )->get();
+        return response()->json( $users );
     }
 
     public function create( Request $request ) {
@@ -41,14 +41,14 @@ class UserController extends Controller {
                 'updated_at' => Carbon::now(),
             ] );
 
-           $user = app('db')->table('users')->select('fullname','username','email')->where('id',$id)->first();
+            $user = app( 'db' )->table( 'users' )->select( 'fullname', 'username', 'email' )->where( 'id', $id )->first();
 
-            return response()->json([
-               'id' => $id,
-               'fullname' => $user->fullname,
-               'username' => $user->username,
-               'email' => $user->email,
-            ],201);
+            return response()->json( [
+                'id' => $id,
+                'fullname' => $user->fullname,
+                'username' => $user->username,
+                'email' => $user->email,
+            ], 201 );
         } catch ( \PDOException $e ) {
             return response()->json( [
                 'success' => false,
@@ -56,6 +56,38 @@ class UserController extends Controller {
             ], 400 );
         }
 
+    }
+
+    public function authenticate( Request $request ) {
+
+        //validation
+
+        try {
+            $this->validate( $request, [
+                'email' => 'required|email',
+                'password' => 'required|min:6',
+            ] );
+        } catch ( ValidationException $e ) {
+            return response()->json( [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 442 );
+        }
+
+        $token = app( 'auth' )->attempt( $request->only( 'email', 'password' ) );
+
+        if ( $token ) {
+            return response()->json( [
+                'success' => true,
+                'message' => "User Login Succefully",
+                'token' => $token,
+            ] );
+        }
+
+        return response()->json( [
+            'success' => false,
+            'message' => "Invalid Credentials",
+        ], 400 );
     }
 
 }

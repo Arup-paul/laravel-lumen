@@ -18,6 +18,10 @@ $router->group([
 ],function () use($router) {
      $router->get('/','UserController@index');
 
+     //user auth
+
+     $router->post( '/login', 'UserController@authenticate' );
+
     $router->post('/users','UserController@create');
     $router->get('/users','UserController@index');
 });
