@@ -11,9 +11,13 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return response()->json([
-         'success' =>true,
-         'message' => "welcome to poll Api"
-    ]);
+
+
+$router->group([
+    'prefix' => 'api/v1',
+],function () use($router) {
+     $router->get('/','UserController@index');
+
+    $router->post('/users','UserController@create');
+    $router->get('/users','UserController@index');
 });
